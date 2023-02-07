@@ -1,3 +1,10 @@
+# 📝 2023/02/08
+
+
+[pome-ta/mathOfRealTimeGraphicsTranscriptionNotes](https://github.com/pome-ta/mathOfRealTimeGraphicsTranscriptionNotes) の疑似乱数確認してるから、行ったり来たりして、点在しちゃうかも
+
+
+
 # 📝 2023/02/07
 
 色々と試す用にsandbox を設置
