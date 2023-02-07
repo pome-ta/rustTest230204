@@ -7,6 +7,7 @@ binarius = 10111001
 to_decimal = 0
 
 for n, b in enumerate(str(binarius)[::-1]):
+  print(pow(2, n))
   to_decimal += int(b) * pow(2, n)
 
 print(to_decimal)
