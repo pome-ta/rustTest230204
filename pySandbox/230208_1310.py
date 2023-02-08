@@ -1,5 +1,5 @@
 def print_result(index, num):
-  u32 = f'{num:032b}'[-32:]  # オーバーフローとして
+  u32 = f'{num:032b}' [-32:]  # オーバーフローとして
   result = f'[{index}]: {u32}\t{num}'
   print(result)
 
@@ -20,6 +20,8 @@ if __name__ == '__main__':
     0xb ^ 9,
     0xffffffff,
     0xffffffff + u_time,
+    11.5625,
   ]
+
   binary_output(value_list)
 
