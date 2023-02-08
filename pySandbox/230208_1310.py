@@ -1,5 +1,5 @@
 def print_result(index, num):
-  result = f'[{index}]: {num:032b}'
+  result = f'[{index}]: {num:032b}\t{num}'
   print(result)
 
 
@@ -10,6 +10,8 @@ def binary_output(num_list):
 
 
 if __name__ == '__main__':
-  value_list = [0xb, 9]
+  u_time = 110
+
+  value_list = [u_time, 0xb, 9, 0xb ^ 9]
   binary_output(value_list)
 
