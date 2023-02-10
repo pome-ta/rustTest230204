@@ -38,7 +38,10 @@ def float_to_hex(f: float) -> str:
 def floatBitsToUint(num: float) -> str:
   sign_is = '' if num < 0.0 else 0
   hex_str = float_to_hex(num)
-  bin_str = bin(int(hex_str, 16))[2:]
+  to_int_bin = bin(int(hex_str, 16))
+  _bin_str = to_int_bin[2:]
+  bin_str = '0' * (31 - len(_bin_str)) + _bin_str
+
   return str(sign_is) + bin_str
 
 
@@ -63,24 +66,15 @@ def binary_output(num_list):
   list_index = reversed(range(len(num_list)))
   for i, n in zip(list_index, num_list[::-1]):
     b = number_to_binary(n)
-    #print_result(i, b, n)
-    print_result(i, b)
+
+    print_result(i, b, n)
+    #print_result(i, b)
 
 
 if __name__ == '__main__':
   u_time = 110.0
 
-  value_list = [
-    int(u_time),
-    0xb,
-    9,
-    0xb ^ 9,
-    0xffffffff,
-    0xffffffff + int(u_time),
-    u_time,
-    -u_time,
-    11.5625,
-  ]
+  value_list = [float(i + 1.0) for i in range(10)]
 
   binary_output(value_list)
 
