@@ -20,7 +20,11 @@ def print_result(index, num):
     u32 = f'{num:032b}' [-32:]  # オーバーフローとして
   elif isinstance(num, float):
     u32 = floatBitsToUint(num)
-  result = f'[{index}]: {u32}\t{num}'
+
+  row = ''
+  for n, i in enumerate(u32):
+    row += '|' + i if n == 1 or n == 9 else i
+  result = f'[{index}]: {row}\t{num}'
   print(result)
 
 
@@ -29,9 +33,6 @@ def binary_output(num_list):
   for i, n in zip(list_index, num_list[::-1]):
     print_result(i, n)
 
-
-def header_footer():
-  pass
 
 
 if __name__ == '__main__':
