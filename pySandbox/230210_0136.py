@@ -15,6 +15,7 @@ def floatBitsToUint(num: float) -> str:
   return str(sign_is) + bin_str
 
 
+
 def print_result(index, num):
   if isinstance(num, int):
     u32 = f'{num:032b}' [-32:]  # オーバーフローとして
