@@ -1,9 +1,10 @@
 import struct
 
-# [Pythonで浮動小数点数floatと16進数表現の文字列を相互に変換 | note.nkmk.me](https://note.nkmk.me/python-float-hex/)
 
-
-def float_to_hex(f):
+def float_to_hex(f: float) -> str:
+  """
+  [Pythonで浮動小数点数floatと16進数表現の文字列を相互に変換 | note.nkmk.me](https://note.nkmk.me/python-float-hex/)
+  """
   return hex(struct.unpack('>I', struct.pack('>f', f))[0])
 
 
@@ -15,14 +16,17 @@ def floatBitsToUint(num: float) -> str:
   return str(sign_is) + bin_str
 
 
-def print_result(index, num):
+def number_to_binary(num) -> str:
   if isinstance(num, int):
     u32 = f'{num:032b}' [-32:]  # オーバーフローとして
   elif isinstance(num, float):
     u32 = floatBitsToUint(num)
+  return u32
 
+
+def print_result(index: int, binary: str, num):
   row = ''
-  for n, i in enumerate(u32):
+  for n, i in enumerate(binary):
     row += '|' + i if n == 1 or n == 9 else i
   result = f'[{index}]: {row}\t{num}'
   print(result)
@@ -31,7 +35,20 @@ def print_result(index, num):
 def binary_output(num_list):
   list_index = reversed(range(len(num_list)))
   for i, n in zip(list_index, num_list[::-1]):
-    print_result(i, n)
+    b = number_to_binary(n)
+    print_result(i, b, n)
+
+
+def set_index():
+  def _index(_i, _n):
+    _b = int(_i + _n).to_bytes(1, byteorder='big')
+    return str(_b)[-2:-1]
+
+  b_list = [_index(i, 48) if i < 10 else _index(i, 55) for i in range(32)]
+  out = 'idx: '
+  for n, b in enumerate(b_list):
+    out += '|' + b if n == 1 or n == 9 else b
+  print(out)
 
 
 if __name__ == '__main__':
@@ -46,18 +63,7 @@ if __name__ == '__main__':
     0xffffffff + u_time,
     11.5625,
   ]
-
+  set_index()
   binary_output(value_list)
-  #h = float_to_hex(11.5625)
-  #i = int(h, 16)
-  #b = bin(int(h, 16))
-  #bb = b[2:]
-  #bbb = '0' + bb
-  f2u = floatBitsToUint(11.5625)
-  b = '0b' + f2u
-  q = int(b, 0)
-  b8 = struct.pack("I", q)
-  #print(struct.unpack("f", b8)[0])
-
-  #print(bin(h))
+  set_index()
 
