@@ -1,4 +1,6 @@
-# todo: 浮.動小数点数処理する
+# todo: 浮動小数点数処理する
+def floatBitsToUint(num: float) -> str:
+  pass
 
 
 def print_result(index, num):
