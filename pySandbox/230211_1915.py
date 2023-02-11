@@ -1,4 +1,6 @@
 import struct
+import statistics
+import random
 
 k = 0x456789ab
 UINT_MAX = 0xffffffff
@@ -16,9 +18,10 @@ def _floatBitsToUint(num: float) -> str:
   sign_is = '' if num < 0.0 else 0
   hex_str = float_to_hex(num)
   to_int_bin = bin(int(hex_str, 16))
-  _bin_str = to_int_bin[2:]
-  bin_str = '0' * (31 - len(_bin_str)) + _bin_str
-  return str(sign_is) + bin_str
+  _bin = to_int_bin[2:]
+  bin_raw = '0' * (31 - len(_bin)) + _bin
+  bin_str = str(sign_is) + bin_raw
+  return bin_str[:32]
 
 
 def floatBitsToUint(num: float) -> int:
@@ -31,7 +34,8 @@ def uhash11(n):
   n ^= (n >> 1)
   n *= k
   n ^= (n << 1)
-  return n * k
+  nk = n * k
+  return nk
 
 
 def hash11(p: float):
@@ -39,4 +43,6 @@ def hash11(p: float):
   return uhash11(n) / uhash11(UINT_MAX)
 
 
-r = hash11(0.5)
+r = [hash11(random.random()) for _ in range(1000)]
+print(statistics.mean(r))
+
