@@ -38,11 +38,40 @@ def uhash11(n):
   return nk
 
 
+def uint_to_float(u_num: int) -> float:
+  b8 = struct.pack('f', u_num)
+  f32 = struct.unpack('f', b8)
+  return f32[0]
+
+
+uMaxFloat = uint_to_float(UINT_MAX)
+
+
 def hash11(p: float):
   n = floatBitsToUint(p)
-  return uhash11(n) / uhash11(UINT_MAX)
+  # uint_hash = uhash11(n)
+  # to_float = uint_to_float(uint_hash)
+  # return uint_to_float(uint_hash) / uMaxFloat
+  # return float(uhash11(n)) / float(UINT_MAX)
+  return uhash11(n) / UINT_MAX
 
 
 r = [hash11(random.random()) for _ in range(1000)]
+# r = [hash11(float(i)) for i in range(1000)]
 print(statistics.mean(r))
 
+# hash11(1.0)
+
+# uu = _floatBitsToUint(1.0)
+
+# yint = int('0b' + uu, 2)
+# zint = int('0b' + uu, 0)
+
+# b8 = struct.pack('f', yint)
+
+'''
+q = int(b, 0)
+b8 = struct.pack("I", q)
+print(struct.unpack("f", b8)[0])
+'''
+x = 1
