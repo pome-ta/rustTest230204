@@ -34,7 +34,7 @@ def float_to_hex(f: float) -> str:
   return hex(struct.unpack('>I', struct.pack('>f', f))[0])
 
 
-# todo: 浮動小数点数処理する
+# todo: 浮動小数点数処理する 32bit
 def floatBitsToUint(num: float) -> str:
   sign_is = '' if num < 0.0 else 0
   hex_str = float_to_hex(num)
