@@ -38,6 +38,7 @@ def hash11(p: float):
     n = floatBitsToUint(p)
 
 
-fff = floatBitsToUint(10.0)
+# fff = floatBitsToUint(10.0)
+fff = floatBitsToUint(11.5625)
 print(fff)
 x = 1
