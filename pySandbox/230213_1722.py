@@ -2,6 +2,8 @@ import struct
 import statistics
 import random
 
+import matplotlib.pyplot as plt
+
 k = 0x456789ab
 UINT_MAX = 0xffffffff
 
@@ -105,6 +107,9 @@ def binary_output(num_list: list):
 
 
 r = [hash11(float(i)) for i in range(10000)]
-print(statistics.mean(r))
+plt.hist(r)
+plt.show()
+print('平均:',statistics.mean(r))
+print('標準偏差:',statistics.stdev(r))
 x = 1
 
