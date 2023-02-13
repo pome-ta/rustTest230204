@@ -104,24 +104,7 @@ def binary_output(num_list: list):
     print_result(i, b)
 
 
-u = uhash11(floatBitsToUint(1.0))
-fu = overflow_cast(u)
-fm = overflow_cast(UINT_MAX)
-
-#fb = floatBitsToUint(hf)
-#um = overflow_cast(float(UINT_MAX))
-binary_output([
-  u,
-  floatBitsToUint(fu),
-  0,
-  UINT_MAX,
-  floatBitsToUint(fm),
-  0,
-  fu / fm,
-  0,
-  0,
-])
-
-print(fu / fm)
+r = [hash11(float(i)) for i in range(10000)]
+print(statistics.mean(r))
 x = 1
 

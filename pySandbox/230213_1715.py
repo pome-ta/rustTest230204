@@ -102,13 +102,14 @@ def binary_output(num_list: list):
     print_result(i, b)
 
 
-u = uhash11(floatBitsToUint(1.0))
+u = uhash11(floatBitsToUint(-1.2))
 fu = overflow_cast(u)
 fm = overflow_cast(UINT_MAX)
 
 #fb = floatBitsToUint(hf)
 #um = overflow_cast(float(UINT_MAX))
 binary_output([
+  floatBitsToUint(-1.2),
   u,
   floatBitsToUint(fu),
   0,
@@ -117,9 +118,7 @@ binary_output([
   0,
   fu / fm,
   0,
-  0,
 ])
 
-print(fu / fm)
 x = 1
 
