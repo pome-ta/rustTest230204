@@ -109,40 +109,8 @@ def binary_output(num_list):
 
 
 h = uhash11(floatBitsToUint(1.0))
-
-#spFloat4 = struct.pack('>f', h)
-#fff = struct.unpack('>', spFloat4)
-
-
-
-
-#bh = floatBitsToUint(h)
-#binary_output([h, bh])
-#bh = bin(h)
-#binary_output([h])
-'''
-0100
-1110
-0000
-0001
-
-0000
-0000
-0000
-0000
-
-'''
-
-#uintfloat = '0b0100_1110_0000_0001_0000_0000_0000_0000'
-#uintfloat = bin('0100_1110_0000_0001_0000_0000_0000_0000')
-#sp = struct.pack('f', int(uintfloat))
-#sp = struct.pack('I', uintfloat)
-#sup = struct.unpack('I', sp)
-
-#f = float(uintfloat)
-
-#sp = struct.pack('f', h)
-#sup = struct.unpack('I', sp)
-
+sp = float_to_hex(h)
+f = 
+nm = number_to_binary(h)
 x = 1
 
