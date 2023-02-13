@@ -1,4 +1,6 @@
 import struct
+import statistics
+import random
 
 k = 0x456789ab
 UINT_MAX = 0xffffffff
@@ -30,6 +32,14 @@ def set_index(func):
   return wrapper
 
 
+def number_to_binary(num) -> str:
+  if isinstance(num, int):
+    u32 = f'{num:032b}' [-32:]  # オーバーフローとして
+  elif isinstance(num, float):
+    u32 = _floatBitsToUint(num)
+  return u32
+
+
 def float_to_hex(f: float) -> str:
   """
    [Pythonで浮動小数点数floatと16進数表現の文字列を相互に変換 |
@@ -54,6 +64,12 @@ def floatBitsToUint(num: float) -> int:
   return int('0b' + b, 2)
 
 
+def overflow_cast(num: int) -> int:
+  _b = '0b' + number_to_binary(num)
+  b2d = int(_b, 2)
+  return b2d
+
+
 def uhash11(n):
   n ^= (n << 1)
   n ^= (n >> 1)
@@ -63,23 +79,12 @@ def uhash11(n):
   return nk
 
 
-def uint_to_float(u_num: int) -> float:
-  b8 = struct.pack('f', u_num)
-  f32 = struct.unpack('f', b8)
-  return f32[0]
+MAX_CAST = overflow_cast(UINT_MAX)
 
 
-def hash11(p: float):
+def hash11(p: float) -> float:
   n = floatBitsToUint(p)
-  return uhash11(n) / UINT_MAX
-
-
-def number_to_binary(num) -> str:
-  if isinstance(num, int):
-    u32 = f'{num:032b}' [-32:]  # オーバーフローとして
-  elif isinstance(num, float):
-    u32 = _floatBitsToUint(num)
-  return u32
+  return overflow_cast(uhash11(n)) / overflow_cast(UINT_MAX)
 
 
 def print_result(index: int, binary: str, num=''):
@@ -91,25 +96,12 @@ def print_result(index: int, binary: str, num=''):
 
 
 @set_index
-def binary_output(num_list):
+def binary_output(num_list: list):
   list_index = reversed(range(len(num_list)))
   for i, n in zip(list_index, num_list[::-1]):
     b = number_to_binary(n)
     #print_result(i, b, n)
     print_result(i, b)
-
-
-def overflow_cast(num: int) -> int:
-  _b = '0b' + number_to_binary(num)
-  b2d = int(_b, 2)
-  return b2d
-
-
-def to_float(num: int) -> float:
-  _b = '0b' + number_to_binary(num)
-  b2d = int(_b, 2)
-  uf = floatBitsToUint(b2d)  # 2回やっちゃっている
-  return uf
 
 
 u = uhash11(floatBitsToUint(1.0))
@@ -130,8 +122,6 @@ binary_output([
   0,
 ])
 
-
-
-print(fu/fm)
+print(fu / fm)
 x = 1
 
