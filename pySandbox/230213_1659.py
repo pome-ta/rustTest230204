@@ -99,7 +99,7 @@ def binary_output(num_list):
     print_result(i, b)
 
 
-def overflow_cast(num:int)->int:
+def overflow_cast(num: int) -> int:
   _b = '0b' + number_to_binary(num)
   b2d = int(_b, 2)
   return b2d
@@ -112,11 +112,23 @@ def to_float(num: int) -> float:
   return uf
 
 
-h = uhash11(floatBitsToUint(1.0))
-hf = overflow_cast(h)
-fb = floatBitsToUint(hf)
-um = overflow_cast(float(UINT_MAX))
-binary_output([h, hf, fb, UINT_MAX, um])
+u = uhash11(floatBitsToUint(1.0))
+fu = overflow_cast(u)
+fm = overflow_cast(UINT_MAX)
+
+#fb = floatBitsToUint(hf)
+#um = overflow_cast(float(UINT_MAX))
+binary_output([
+  u,
+  floatBitsToUint(fu),
+  0,
+  UINT_MAX,
+  floatBitsToUint(fm),
+  0,
+  fu / fm,
+  0,
+  0,
+])
 
 x = 1
 
