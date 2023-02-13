@@ -128,10 +128,13 @@ h = uuu(floatBitsToUint(1.0))
 
 '''
 
-uintfloat = '0b0100_1110_0000_0001_0000_0000_0000_0000'
-uintfloat = bin('0100_1110_0000_0001_0000_0000_0000_0000')
-sp = struct.pack('I', int(uintfloat))
-sup = struct.unpack('I', sp)
+
+#1308688384.0 ?
+uintfloat = 0b0100_1110_0000_0001_0000_0000_0000_0000
+#uintfloat = bin('0100_1110_0000_0001_0000_0000_0000_0000')
+sp = struct.pack('f', int(uintfloat))
+sup = struct.unpack('f', sp)
+print(sup)
 #f = float(uintfloat)
 
 #sp = struct.pack('f', h)

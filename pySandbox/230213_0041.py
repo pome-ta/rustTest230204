@@ -54,13 +54,9 @@ def floatBitsToUint(num: float) -> int:
 
 
 def uhash11(n):
-  print(n)
   n ^= (n << 1)
-  print(n)
   n ^= (n >> 1)
-  print(n)
   n *= k
-  print(n)
   n ^= (n << 1)
   nk = n * k
   return nk
@@ -112,7 +108,16 @@ def binary_output(num_list):
     print_result(i, b)
 
 
-h = uuu(floatBitsToUint(1.0))
+h = uhash11(floatBitsToUint(1.0))
+
+#spFloat4 = struct.pack('>f', h)
+#fff = struct.unpack('>', spFloat4)
+
+
+
+
+#bh = floatBitsToUint(h)
+#binary_output([h, bh])
 #bh = bin(h)
 #binary_output([h])
 '''
@@ -128,10 +133,12 @@ h = uuu(floatBitsToUint(1.0))
 
 '''
 
-uintfloat = '0b0100_1110_0000_0001_0000_0000_0000_0000'
-uintfloat = bin('0100_1110_0000_0001_0000_0000_0000_0000')
-sp = struct.pack('I', int(uintfloat))
-sup = struct.unpack('I', sp)
+#uintfloat = '0b0100_1110_0000_0001_0000_0000_0000_0000'
+#uintfloat = bin('0100_1110_0000_0001_0000_0000_0000_0000')
+#sp = struct.pack('f', int(uintfloat))
+#sp = struct.pack('I', uintfloat)
+#sup = struct.unpack('I', sp)
+
 #f = float(uintfloat)
 
 #sp = struct.pack('f', h)
