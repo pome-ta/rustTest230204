@@ -126,4 +126,12 @@ binary_output([
   0,
 ])
 
+
+fuu = floatBitsToUint(-1.2)
+i_str = f'{fuu:b}'
+print(fuu)
+print(i_str)
+print(i_str[-32:])
+
+
 x = 1
