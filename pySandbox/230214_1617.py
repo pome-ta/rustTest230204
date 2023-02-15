@@ -10,7 +10,8 @@ def uint32(s: int) -> int:
 
 def floatBitsToUint(f: float) -> int:
   fp = struct.pack('>f', f)
-  return fp
+  fu = struct.unpack('>I', fp)[0]
+  return uint32(fu)
 
 
 num_max = 0xffff_ffff
@@ -26,8 +27,7 @@ record_size = struct.calcsize('I')
 
 fup = floatBitsToUint(110.0)
 fun = floatBitsToUint(-110.0)
-fpp = struct.unpack('>I', fup)
-fpn = struct.unpack('>I', fun)
+
 
 x = 1
 
