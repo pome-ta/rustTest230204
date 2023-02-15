@@ -4,12 +4,11 @@ import struct
 import math
 import array
 
-
 k = 0x456789ab
 UINT_MAX = 0xffffffff
 
 
-def reference_grid(div_chrs: str,  head_str: str = '') -> str:
+def reference_grid(div_chrs: str, head_str: str='') -> str:
   row = head_str
   for n, c in enumerate(div_chrs):
     row += '|' + c if n == 1 or n == 9 else c
@@ -22,25 +21,28 @@ def set_index(func):
   to_0v = (lambda n, j: int(n + j).to_bytes(1, byteorder='big'))
   repeat_chrs = (lambda chr, l: ''.join(chr for _ in range(l)))
 
-  zoro2v = [to_0v(i, 48).decode('utf8') if i <
-            10 else to_0v(i, 55).decode('utf8') for i in range(32)]
-  hd = 'inx :'
-  lngth = 48
+  zoro2v = [
+    to_0v(i, 48).decode('utf8') if i < 10 else to_0v(i, 55).decode('utf8')
+    for i in range(32)
+  ]
+  hd = 'inx:'
+  lngth = 46
 
   def wrapper(*args, **kwargs):
     output_list = [
-        repeat_chrs('=', lngth),
-        reference_grid(zoro2v, hd),
-        repeat_chrs('-', lngth),
-        func(*args, **kwargs),
-        repeat_chrs('-', lngth),
+      repeat_chrs('=', lngth),
+      reference_grid(zoro2v, hd),
+      repeat_chrs('-', lngth),
+      func(*args, **kwargs),
+      repeat_chrs('-', lngth),
     ]
     return '\n'.join(output_list)
+
   return wrapper
 
 
 def print_result(index: int, binary, num=''):
-  hd = f'[{index}] :'
+  hd = f'[{index}]:'
   binary_str = f'{binary:032b}'
   row = reference_grid(binary_str)
   result = f'{hd}{row}\t{num}'
@@ -79,15 +81,15 @@ def uint_set(num) -> int:
 t = 110.9
 
 num_list = [
-    uint32(t),
-    uint32(-t),
-    floatBitsToUint(t),
-    0xb ^ 9,
-    0xffffffff,
-    0xffffffff + uint32(t),
-    floatBitsToUint(math.floor(t)),
-    floatBitsToUint(math.floor(-t)),
-    floatBitsToUint(11.5625),
+  uint32(t),
+  uint32(-t),
+  floatBitsToUint(t),
+  0xb ^ 9,
+  0xffffffff,
+  0xffffffff + uint32(t),
+  floatBitsToUint(math.floor(t)),
+  floatBitsToUint(math.floor(-t)),
+  floatBitsToUint(11.5625),
 ]
 
 uint_list = [uint_set(i) for i in num_list]
@@ -96,3 +98,4 @@ hoge = binary_output(uint_list)
 
 print(hoge)
 x = 1
+
