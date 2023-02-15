@@ -15,8 +15,6 @@ def floatBitsToUint(f: float) -> int:
 
 num_max = 0xffff_ffff
 
-print(ctypes.c_uint32(-2))
-
 f2u = ctypes.c_uint32(num_max)
 uu = uint32(110)
 ux = uint32(num_max)
@@ -26,7 +24,10 @@ sp = struct.pack('>I', uu)
 
 record_size = struct.calcsize('I')
 
-fu = floatBitsToUint(110.0)
+fup = floatBitsToUint(110.0)
+fun = floatBitsToUint(-110.0)
+fpp = struct.unpack('>I', fup)
+fpn = struct.unpack('>I', fun)
 
 x = 1
 
