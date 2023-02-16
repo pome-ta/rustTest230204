@@ -18,13 +18,10 @@ def reference_grid(div_chrs: str, head_str: str='') -> str:
 
 def set_index(func):
   # xxx: 色々と酷いデコレータ、そしてlambda
-  to_0v = (lambda n, j: int(n + j).to_bytes(1, byteorder='big'))
+  to_0v = (lambda n, j: int(n + j).to_bytes(1, byteorder='big').decode(encoding='utf8'))
   repeat_chrs = (lambda chr, l: ''.join(chr for _ in range(l)))
 
-  zoro2v = [
-    to_0v(i, 48).decode('utf8') if i < 10 else to_0v(i, 55).decode('utf8')
-    for i in range(32)
-  ]
+  zoro2v = [to_0v(i, 48) if i < 10 else to_0v(i, 55) for i in range(32)]
   hd = 'inx:'
   lngth = 46
 
@@ -32,7 +29,7 @@ def set_index(func):
     output_list = [
       repeat_chrs('=', lngth),
       reference_grid(zoro2v, hd),
-      repeat_chrs('-', lngth),
+      #repeat_chrs('-', lngth),
       func(*args, **kwargs),
       repeat_chrs('-', lngth),
     ]
