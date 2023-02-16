@@ -86,12 +86,12 @@ def uhash11(n) -> int:
   return uint32(nk)
 
 
-u = uhash11(floatBitsToUint(1.2))
+u = uhash11(floatBitsToUint(-1.2))
 fu = float32(u)
 fm = float32(UINT_MAX)
 
 num_list = [
-  floatBitsToUint(1.2),
+  floatBitsToUint(-1.2),
   u,
   floatBitsToUint(fu),
   0,
