@@ -58,7 +58,8 @@ def binary_output(num_list):
 
 def uint32(s) -> int:
   # xxx: 負の値処理するかどうか？
-  _s = s if s > 0 else 0
+  _s = s
+  #_s = s if s > 0 else 0
   _c_uint32 = ctypes.c_uint32(int(_s))
   return _c_uint32.value
 
@@ -82,8 +83,6 @@ def floatBitsToUint(f: float) -> int:
 
 def uint_set(num) -> int:
   return uint32(num)
-
-
 
 
 def uhash11(n) -> int:
@@ -110,26 +109,21 @@ def run():
 #cProfile.run('run()', sort=1)
 
 
-def split_list(l, n):
-  for idx in range(0, len(l), n):
-    yield l[idx:idx + n]
+steps = 100
+#rng = range(-100000, 100000, steps)
+result_list = [[
+  statistics.mean(
+    [hash11(float(i)) for i in range(iter_num, iter_num + steps)])
+][0] for iter_num in range(-1000000, 1000000, steps)]
 
 
-#lst = list(range(-1000000, 1000000))
 
-
-rng = range(-100, 100)
-div = 10
-index_list = (rng[idx:idx + div] for idx in range(0, len(rng), div))
-
-
-result_list = [print([_ for _ in i]) for i in index_list]
-
-#result_list = [statistics.mean([(hash11(float(i)) for i in _)] for _ in result]
-
-#print('平均:', statistics.mean(result_list))
-#print('標準偏差:', statistics.stdev(result_list))
-    
-
+print('平均:', statistics.mean(result_list))
+print('標準偏差:', statistics.stdev(result_list))
+'''
+for iter_num in rng:
+  _result_hash = [hash11(float(i)) for i in range(iter_num, iter_num + steps)]
+  print(statistics.mean([hash11(float(i)) for i in range(iter_num, iter_num + steps)]))
+'''
 x = 1
 
