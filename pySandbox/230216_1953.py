@@ -1,8 +1,8 @@
 import ctypes
 import struct
+import statistics
 
-import math
-import array
+import matplotlib.pyplot as plt
 
 k = 0x456789ab
 UINT_MAX = 0xffffffff
@@ -86,26 +86,17 @@ def uhash11(n) -> int:
   return uint32(nk)
 
 
-u = uhash11(floatBitsToUint(1.2))
-fu = float32(u)
-fm = float32(UINT_MAX)
+def hash11(p: float) -> float:
+  n = floatBitsToUint(p)
+  return float32(uhash11(n)) / float32(UINT_MAX)
 
-num_list = [
-  floatBitsToUint(1.2),
-  u,
-  floatBitsToUint(fu),
-  0,
-  UINT_MAX,
-  floatBitsToUint(fm),
-  0,
-  floatBitsToUint(fu / fm),
-  0,
-]
 
-uint_list = [uint_set(i) for i in num_list]
+r = [hash11(float(i)) for i in range(10000)]
+plt.hist(r)
+plt.show()
+print('平均:', statistics.mean(r))
+print('標準偏差:', statistics.stdev(r))
+x = 1
 
-hoge = binary_output(uint_list)
-
-print(hoge)
 x = 1
 
