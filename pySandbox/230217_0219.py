@@ -110,18 +110,25 @@ def run():
 #cProfile.run('run()', sort=1)
 
 
+rng = range(-1000000, 1000000)
+steps = 100
+index_list = (rng[idx:idx + steps] for idx in range(0, len(rng), steps))
+
+result_list = list(
+  chain.from_iterable([[hash11(float(i)) for i in _] for _ in index_list]))
+'''
 steps = 100
 #rng = range(-100000, 100000, steps)
 result_list = [[
   statistics.mean(
     [hash11(float(i)) for i in range(iter_num, iter_num + steps)])
 ][0] for iter_num in range(-1000000, 1000000, steps)]
-
+'''
 plt.hist(result_list)
 plt.show()
 
-#print('平均:', statistics.mean(result_list))
-#print('標準偏差:', statistics.stdev(result_list))
+print('平均:', statistics.mean(result_list))
+print('標準偏差:', statistics.stdev(result_list))
 '''
 for iter_num in rng:
   _result_hash = [hash11(float(i)) for i in range(iter_num, iter_num + steps)]
