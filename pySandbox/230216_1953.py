@@ -2,13 +2,13 @@ import ctypes
 import struct
 import statistics
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 k = 0x456789ab
 UINT_MAX = 0xffffffff
 
 
-def reference_grid(div_chrs: str, head_str: str='') -> str:
+def reference_grid(div_chrs: str, head_str: str = '') -> str:
   row = head_str
   for n, c in enumerate(div_chrs):
     row += '|' + c if n == 1 or n == 9 else c
@@ -18,7 +18,8 @@ def reference_grid(div_chrs: str, head_str: str='') -> str:
 
 def set_index(func):
   # xxx: 色々と酷いデコレータ、そしてlambda
-  to_0v = (lambda n, j: int(n + j).to_bytes(1, byteorder='big').decode(encoding='utf8'))
+  to_0v = (lambda n, j: int(n + j).to_bytes(1,
+           byteorder='big').decode(encoding='utf8'))
   repeat_chrs = (lambda chr, l: ''.join(chr for _ in range(l)))
 
   zoro2v = [to_0v(i, 48) if i < 10 else to_0v(i, 55) for i in range(32)]
@@ -27,11 +28,11 @@ def set_index(func):
 
   def wrapper(*args, **kwargs):
     output_list = [
-      repeat_chrs('=', lngth),
-      reference_grid(zoro2v, hd),
-      repeat_chrs('-', lngth),
-      func(*args, **kwargs),
-      repeat_chrs('-', lngth),
+        repeat_chrs('=', lngth),
+        reference_grid(zoro2v, hd),
+        repeat_chrs('-', lngth),
+        func(*args, **kwargs),
+        repeat_chrs('-', lngth),
     ]
     return '\n'.join(output_list)
 
@@ -92,11 +93,10 @@ def hash11(p: float) -> float:
 
 
 r = [hash11(float(i)) for i in range(10000)]
-plt.hist(r)
-plt.show()
+# plt.hist(r)
+# plt.show()
 print('平均:', statistics.mean(r))
 print('標準偏差:', statistics.stdev(r))
 x = 1
 
 x = 1
-
