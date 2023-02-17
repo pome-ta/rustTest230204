@@ -41,7 +41,7 @@ class uvec2(uvec):
     self._y = _y
 
   @xy.setter
-  def xy(self, _xy: list):
+  def xy(self, _xy:list):
     _x, _y = _xy
     self._x = _x
     self._y = _y
@@ -186,41 +186,42 @@ def hash11(p: float) -> float:
   return float32(uhash11(n)) / float32(UINT_MAX)
 
 
-def uhash22(n: list) -> list:
-  n ^= (n << 1)
-  n ^= (n >> 1)
-  n *= k
-  n ^= (n << 1)
-  nk = n * k
-  return uint32(nk)
+def uhash22(n: uvec2) -> uvec2:
+  #n.xy ^= (n.yx << u.xy)
+  n.x ^= (n.y << u.x)
+  n.y ^= (n.x << u.y)
+  
+  #n.xy ^= (n.yx >> u.xy)
+  n.x ^= (n.y >> u.x)
+  n.y ^= (n.x >> u.y)
+  
+  #n.xy *= k.xy
+  n.x *= k.x
+  n.y *= k.y
+
+  #n.xy ^= (n.yx << u.xy)
+  n.x ^= (n.y << u.x)
+  n.y ^= (n.x << u.y)
+  
+  #n.xy = n.xy * k.xy
+  n.x = n.x * k.x
+  n.y = n.y * k.y
+  
+  n.x = uint32(n.x)
+  n.y = uint32(n.y)
+
+
+  return n
 
 
 if __name__ == '__main__':
+  uu = uvec2([2, 5])
+  uuu  = uhash22(uu)
   # view = View()
   # view.present()
   # view.present(hide_title_bar=True)
   # view.present(style='fullscreen', orientations=['portrait'])
   u = uvec2([1, 2])
-  from itertools import product
-  xyz1 = ['x', 'y', 'z']
-  xyz2 = ['x', 'y', 'z']
-  xyz3 = ['x', 'y', 'z']
-  xyzs = list(product(xyz1, xyz2, xyz3))
 
-  print(xyzs)
-  print('---')
-  out_list = []
-
-  for xx, yy, zz in xyzs:
-    if xx == yy or xx == zz or yy == zz:
-      continue
-    out_list.append([xx, yy, zz])
-  print(out_list)
-
-  # x = 1
-  # print(u.x)
-  # print(u.y)
-  # print(*u.xy)
-  # print(u.yx)
   x = 1
 
