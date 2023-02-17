@@ -59,8 +59,7 @@ def binary_output(num_list):
 
 def uint32(s) -> int:
   # xxx: 負の値処理するかどうか？
-  _s = s
-  #_s = s if s > 0 else 0
+  _s = s if s > 0 else 0
   _c_uint32 = ctypes.c_uint32(int(_s))
   return _c_uint32.value
 
