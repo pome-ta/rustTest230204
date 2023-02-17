@@ -53,8 +53,9 @@ class View(ui.View):
     self.bg_color = 1
 
   def draw(self):
-    margin = 16
     sq = 320
+    margin = 16
+
     width = sq
     height = sq
 
