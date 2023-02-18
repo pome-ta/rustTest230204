@@ -5,7 +5,7 @@ from collections import UserList
 
 
 class uvec2(UserList):
-  def __init__(self, _xy: list = [0.0, 0.0]):
+  def __init__(self, _xy: list=[0.0, 0.0]):
     super().__init__(_xy)
 
   def __add__(self, other: list) -> list:
@@ -148,7 +148,7 @@ class uvec2(UserList):
 
 
 class uvec3(UserList):
-  def __init__(self, _xyz: list = [0.0, 0.0, 0.0]):
+  def __init__(self, _xyz: list=[0.0, 0.0, 0.0]):
     super().__init__(_xyz)
 
   def __add__(self, other: list) -> list:
@@ -392,15 +392,15 @@ class uvec3(UserList):
 
 UINT_MAX = 0xffffffff
 k = [
-    0x456789ab,
-    0x6789ab45,
-    0x89ab4567,
+  0x456789ab,
+  0x6789ab45,
+  0x89ab4567,
 ]
 
 u = [
-    1,
-    2,
-    3,
+  1,
+  2,
+  3,
 ]  # todo: シフト数
 
 fu_pack = struct.Struct('>f')
@@ -433,15 +433,15 @@ def uint_set(num) -> int:
 
 UINT_MAX = 0xffffffff
 k = [
-    0x456789ab,
-    0x6789ab45,
-    0x89ab4567,
+  0x456789ab,
+  0x6789ab45,
+  0x89ab4567,
 ]
 
 u = [
-    1,
-    2,
-    3,
+  1,
+  2,
+  3,
 ]  # todo: シフト数
 
 
@@ -496,3 +496,4 @@ if __name__ == '__main__':
   u1 += u1.yx
 
   x = 1
+
