@@ -1,3 +1,9 @@
+# 📝 2023/02/18
+
+ダンダーメソッドは、要素数気にせず処理がいいかもだけど、いまは愚直にやる
+
+[gh640/python-dunder-names-ja: Python のダンダーな名前まとめ](https://github.com/gh640/python-dunder-names-ja)
+
 # 📝 2023/02/14
 
 あらためて、数値の型関係を書き直す
