@@ -285,12 +285,12 @@ class uvec3(UserList):
 
   @property
   def xy(self) -> list:
-    _x, _y = self.data
+    _x, _y, _ = self.data
     return uvec2([uint32(_x), uint32(_y)])
 
   @property
   def yx(self) -> list:
-    _x, _y = self.data
+    _x, _y, _ = self.data
     return uvec2([uint32(_y), uint32(_x)])
 
   @property
@@ -390,19 +390,6 @@ class uvec3(UserList):
     self.data[2] = uint32(_z)
 
 
-UINT_MAX = 0xffffffff
-k = [
-  0x456789ab,
-  0x6789ab45,
-  0x89ab4567,
-]
-
-u = [
-  1,
-  2,
-  3,
-]  # todo: シフト数
-
 fu_pack = struct.Struct('>f')
 fu_unpack = struct.Struct('>I')
 
@@ -432,17 +419,17 @@ def uint_set(num) -> int:
 
 
 UINT_MAX = 0xffffffff
-k = [
+k = uvec3([
   0x456789ab,
   0x6789ab45,
   0x89ab4567,
-]
+])
 
-u = [
+u = uvec3([
   1,
   2,
   3,
-]  # todo: シフト数
+])  # todo: シフト数
 
 
 def uhash11(n) -> int:
@@ -451,6 +438,7 @@ def uhash11(n) -> int:
   n *= k
   n ^= (n << 1)
   nk = n * k
+  
   return uint32(nk)
 
 
@@ -460,40 +448,15 @@ def hash11(p: float) -> float:
 
 
 def uhash22(n: uvec2) -> uvec2:
-  n.xy ^= (n.yx << u.xy)
-  # n.x ^= (n.y << u.x)
-  # n.y ^= (n.x << u.y)
-
-  n.xy ^= (n.yx >> u.xy)
-  # n.x ^= (n.y >> u.x)
-  # n.y ^= (n.x >> u.y)
-
-  n.xy *= k.xy
-  # n.x *= k.x
-  # n.y *= k.y
-
-  n.xy ^= (n.yx << u.xy)
-  # n.x ^= (n.y << u.x)
-  # n.y ^= (n.x << u.y)
-
-  n.xy = n.xy * k.xy
-  # n.x = n.x * k.x
-  # n.y = n.y * k.y
-
-  n.x = uint32(n.x)
-  n.y = uint32(n.y)
-
-  return n
+  n ^= (n.yx << u.xy)
+  n ^= (n.yx >> u.xy)
+  n *= k.xy
+  n ^= (n.yx << u.xy)
+  return n * k.xy
 
 
 if __name__ == '__main__':
-  u1 = uvec2([1, 2])
-  # u2 = uvec2([3, 4])
-  # u3 = u1.xy + u2
-
-  u2 = u1
-
-  u1 += u1.yx
+  u1 = uhash22(uvec2([1, 2]))
 
   x = 1
 
