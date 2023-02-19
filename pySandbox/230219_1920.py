@@ -3,11 +3,9 @@ import struct
 
 from collections import UserList
 
-import ui
-
 
 class uvec2(UserList):
-  def __init__(self, _xy: list=[0.0, 0.0]):
+  def __init__(self, _xy: list = [0.0, 0.0]):
     super().__init__(_xy)
 
   def __add__(self, other: list) -> list:
@@ -150,7 +148,7 @@ class uvec2(UserList):
 
 
 class uvec3(UserList):
-  def __init__(self, _xyz: list=[0.0, 0.0, 0.0]):
+  def __init__(self, _xyz: list = [0.0, 0.0, 0.0]):
     super().__init__(_xyz)
 
   def __add__(self, other: list) -> list:
@@ -422,15 +420,15 @@ def uint_set(num) -> int:
 
 UINT_MAX = 0xffffffff
 k = uvec3([
-  0x456789ab,
-  0x6789ab45,
-  0x89ab4567,
+    0x456789ab,
+    0x6789ab45,
+    0x89ab4567,
 ])
 
 u = uvec3([
-  1,
-  2,
-  3,
+    1,
+    2,
+    3,
 ])  # todo: シフト数
 
 
@@ -440,7 +438,7 @@ def uhash11(n) -> int:
   n *= k
   n ^= (n << 1)
   nk = n * k
-  
+
   return uint32(nk)
 
 
@@ -454,49 +452,28 @@ def uhash22(n: uvec2) -> uvec2:
   n ^= (n.yx >> u.xy)
   n *= k.xy
   n ^= (n.yx << u.xy)
-  nk = n * k.xy
-  
-  return uvec2(nk)
+  return n * k.xy
 
-def hash22(p):
-  _nx = floatBitsToUint(p.x)
-  _ny = floatBitsToUint(p.y)
-  n = uvec2([_nx, _ny])
+
+def hash22(p: list) -> uvec2:
+  n = uvec2([floatBitsToUint(p[0]), floatBitsToUint(p[1])])
   uh = uhash22(n)
-  #print(uh.x)
   _x = float32(uh.x / UINT_MAX)
   _y = float32(uh.y / UINT_MAX)
   return uvec2([_x, _y])
 
 
-class View(ui.View):
-  def __init__(self):
-    self.bg_color = 1
-
-  def draw(self):
-    sq = 320
-    margin = 16
-
-    width = sq
-    height = sq
-
-    for x in range(width):
-      for y in range(height):
-        rect = ui.Path.rect(x + margin, y + margin, 1, 1)
-      
-        px = x / sq
-        py = y / sq
-        pnxy = hash22(uvec2([px, py]))
-        ui.set_color((pnxy.x, pnxy.y, 1.0))
-      
-        #ui.set_color(c)
-        rect.fill()
-
 if __name__ == '__main__':
-  view = View()
-  #view.present()
-  #view.present(hide_title_bar=True)
-  view.present(style='fullscreen', orientations=['portrait'])
+  sq = 4
+  margin = 16
+  width = sq
+  height = sq
+
+  for x in range(width):
+    for y in range(height):
+      px = x / sq
+      py = y / sq
+      pnxy = hash22([px, py])
+      print(pnxy)
 
   x = 1
-
