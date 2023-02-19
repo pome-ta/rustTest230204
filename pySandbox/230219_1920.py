@@ -464,7 +464,7 @@ def hash22(p: list) -> uvec2:
 
 
 if __name__ == '__main__':
-  sq = 4
+  sq = 256
   margin = 16
   width = sq
   height = sq
@@ -474,6 +474,6 @@ if __name__ == '__main__':
       px = x / sq
       py = y / sq
       pnxy = hash22([px, py])
-      print(pnxy)
+      #print(pnxy)
 
   x = 1

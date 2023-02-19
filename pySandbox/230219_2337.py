@@ -1,7 +1,11 @@
 import ctypes
 import struct
-
+import math
 from collections import UserList
+from io import BytesIO
+
+import numpy as np
+from PIL import Image as ImageP
 
 import ui
 
@@ -435,17 +439,11 @@ u = uvec3([
 
 
 def uhash11(n) -> int:
+  n ^= (n << u.x)
+  n ^= (n >> u.x)
+  n *= k.x
   n ^= (n << 1)
-  n ^= (n >> 1)
-  n *= k
-  n ^= (n << 1)
-  nk = n * k
-  return uint32(nk)
-
-
-def hash11(p: float) -> float:
-  n = floatBitsToUint(p)
-  return float32(uhash11(n)) / float32(UINT_MAX)
+  return uint32(n * k.x)
 
 
 def uhash22(n: uvec2) -> uvec2:
@@ -456,6 +454,19 @@ def uhash22(n: uvec2) -> uvec2:
   return n * k.xy
 
 
+def uhash33(n: uvec3) -> uvec3:
+  n ^= (n.yzx << u)
+  n ^= (n.yzx >> u)
+  n *= k
+  n ^= (n.yzx << u)
+  return n * k
+
+
+def hash11(p: float) -> float:
+  n = floatBitsToUint(p)
+  return float32(uhash11(n) / UINT_MAX)
+
+
 def hash21(p: list) -> float:
   n = uvec2([floatBitsToUint(p[0]), floatBitsToUint(p[1])])
   uh = uhash22(n)
@@ -464,21 +475,73 @@ def hash21(p: list) -> float:
 
 
 def hash22(p: list) -> list:
-  n = uvec2([floatBitsToUint(p[0]), floatBitsToUint(p[1])])
+  n = uvec2([
+    floatBitsToUint(p[0]),
+    floatBitsToUint(p[1]),
+  ])
   uh = uhash22(n)
   _x = float32(uh.x / UINT_MAX)
   _y = float32(uh.y / UINT_MAX)
   return [_x, _y]
 
 
+def hash31(p: list) -> float:
+  n = uvec3([
+    floatBitsToUint(p[0]),
+    floatBitsToUint(p[1]),
+    floatBitsToUint(p[2]),
+  ])
+  uh = uhash33(n)
+  return float32(uh.x / UINT_MAX)
+
+
+def hash33(p: list) -> list:
+  n = uvec3([
+    floatBitsToUint(p[0]),
+    floatBitsToUint(p[1]),
+    floatBitsToUint(p[2]),
+  ])
+  uh = uhash33(n)
+  _x = float32(uh.x / UINT_MAX)
+  _y = float32(uh.y / UINT_MAX)
+  _z = float32(uh.z / UINT_MAX)
+  return [_x, _y, _z]
+
+
+init_img = ImageP.new('RGB', (32, 32))
+base_array = np.asarray(init_img)
+diff_array = np.zeros((32, 32, 3), dtype=np.uint8)
+'''
+def show_canvas(_cpu):
+  #canvas = _cpu.memory[0x200:0x600]
+  #canvas = [_cpu.mem_read(i) for i in range(0x200, 0x600)]
+  canvas = _cpu.bus.cpu_vram[0x200:0x600]
+  count = 0
+  for x, y in product(range(32), range(32)):
+    byt = canvas[count]
+    diff_array[x][y] = color(palette(byt))
+    count += 1
+  #del canvas
+  out_array = base_array + diff_array
+  out_img = ImageP.fromarray(out_array)
+  re_out = out_img.resize((320, 320))
+  with BytesIO() as bIO:
+    re_out.save(bIO, 'png')
+    re_img = ui.Image.from_data(bIO.getvalue())
+    del bIO
+    return re_img
+'''
+
+
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
     self.update_interval = 1 / 60
+    self._time = 0.0
     self.u_time = 0.0
 
   def draw(self):
-    sq = 320
+    sq = 64
     margin = 16
 
     width = sq
@@ -488,8 +551,8 @@ class View(ui.View):
       for y in range(height):
         rect = ui.Path.rect(x + margin, y + margin, 1, 1)
 
-        px = x / sq
-        py = y / sq
+        px = x / sq + self.u_time
+        py = y / sq + self.u_time
 
         if x > sq / 2:
           _x = hash21([px, py])
@@ -500,8 +563,10 @@ class View(ui.View):
         rect.fill()
 
   def update(self):
-    #self.set_needs_display()
-    self.u_time += self.update_interval
+    self._time += self.update_interval
+    self.u_time = math.floor(60.0 * self._time)
+    self.set_needs_display()
+    
 
 
 if __name__ == '__main__':
