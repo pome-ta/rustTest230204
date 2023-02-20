@@ -509,7 +509,7 @@ def hash33(p: list) -> list:
 
 
 RGB_SIZE = 256
-sq_size = 32
+sq_size = 128
 ratio = RGB_SIZE / sq_size
 
 init_img = ImageP.new('RGB', (sq_size, sq_size))
@@ -538,12 +538,24 @@ def show_canvas(_cpu):
 '''
 
 
-def setup_img():
+#@ui.in_background
+def setup_img(_time=0):
   for x in range(sq_size):
     for y in range(sq_size):
+      '''
       _x = x * ratio
       _y = y * ratio
       diff_array[x][y] = np.asarray([_x, _y, 255])
+      '''
+
+      px = x / sq_size + _time
+      py = y / sq_size + _time
+      __x = hash21([px, py])
+      _x = __x * RGB_SIZE
+      #print(_x)
+
+      diff_array[x][y] = np.asarray([_x, _x, _x])
+
   imgp = ImageP.fromarray(diff_array)
   with BytesIO() as bIO:
     imgp.save(bIO, 'png')
@@ -553,18 +565,20 @@ def setup_img():
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
-    #self.update_interval = 1 / 30
+    self.update_interval = 1 / 30
     self._time = 0.0
     self.u_time = 0.0
     self.im_view = ui.ImageView()
     self.im_view.content_mode = ui.CONTENT_SCALE_ASPECT_FIT
     self.im_view.flex = 'WH'
-    self.img = setup_img()
-    self.im_view.image = self.img
+    #self.img = setup_img()
+    #self.im_view.image = self.img
     self.add_subview(self.im_view)
-    
+
   def update(self):
-    pass
+    self._time += self.update_interval
+    self.u_time = math.floor(60.0 * self._time)
+    self.im_view.image = setup_img(self.u_time)
 
 
 if __name__ == '__main__':
