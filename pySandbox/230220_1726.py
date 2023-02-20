@@ -2,6 +2,8 @@ import ctypes
 import struct
 import math
 from collections import UserList
+
+from functools import lru_cache
 from io import BytesIO
 
 import numpy as np
@@ -400,32 +402,25 @@ fu_pack = struct.Struct('>f')
 fu_unpack = struct.Struct('>I')
 
 
+@lru_cache()
 def uint32(s) -> int:
-  
-  if s <= 0xffffffff:
-    return int(s)
-  
-  # xxx: 負の値処理するかどうか？
   _s = s if s > 0 else 0
-  _c_uint32 = ctypes.c_uint32(int(_s))
-  return _c_uint32.value
+  return int(_s) if _s <= 0xffffffff else ctypes.c_uint32(int(_s)).value
 
 
+@lru_cache()
 def float32(f) -> float:
   _c_float = ctypes.c_float(f)
   return _c_float.value
 
 
+@lru_cache()
 def floatBitsToUint(f: float) -> int:
   # fp = struct.pack('>f', f)
   # fu = struct.unpack('>I', fp)[0]
   fp = fu_pack.pack(f)
   fu = fu_unpack.unpack(fp)[0]
   return uint32(fu)
-
-
-def uint_set(num) -> int:
-  return uint32(num)
 
 
 UINT_MAX = 0xffffffff
@@ -511,38 +506,18 @@ def hash33(p: list) -> list:
   _z = float32(uh.z / UINT_MAX)
   return [_x, _y, _z]
 
-sq_size = 256
+
+sq_size = 64
 
 RGB_SIZE = 256
 ratio = RGB_SIZE / sq_size
 
 init_img = ImageP.new('RGB', (sq_size, sq_size))
 base_array = np.asarray(init_img)
-#print(base_array.shape)
 diff_array = np.zeros((sq_size, sq_size, 3), dtype=np.uint8)
-'''
-def show_canvas(_cpu):
-  #canvas = _cpu.memory[0x200:0x600]
-  #canvas = [_cpu.mem_read(i) for i in range(0x200, 0x600)]
-  canvas = _cpu.bus.cpu_vram[0x200:0x600]
-  count = 0
-  for x, y in product(range(32), range(32)):
-    byt = canvas[count]
-    diff_array[x][y] = color(palette(byt))
-    count += 1
-  #del canvas
-  out_array = base_array + diff_array
-  out_img = ImageP.fromarray(out_array)
-  re_out = out_img.resize((320, 320))
-  with BytesIO() as bIO:
-    re_out.save(bIO, 'png')
-    re_img = ui.Image.from_data(bIO.getvalue())
-    del bIO
-    return re_img
-'''
 
 
-#@ui.in_background
+@lru_cache()
 def setup_img(_time=0):
   for x in range(sq_size):
     for y in range(sq_size):
@@ -554,11 +529,15 @@ def setup_img(_time=0):
 
       px = x / sq_size + _time
       py = y / sq_size + _time
+      '''
       __x = hash21([px, py])
       _x = __x * RGB_SIZE
-      #print(_x)
-
       diff_array[x][y] = np.asarray([_x, _x, _x])
+      '''
+      p_hash = hash22([px, py])
+      _x = p_hash[0] * RGB_SIZE
+      _y = p_hash[1] * RGB_SIZE
+      diff_array[x][y] = np.asarray([_x, _y, 255])
 
   imgp = ImageP.fromarray(diff_array)
   with BytesIO() as bIO:
@@ -569,7 +548,7 @@ def setup_img(_time=0):
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
-    self.update_interval = 1 / 15
+    self.update_interval = 1 / 60
     self._time = 0.0
     self.u_time = 0.0
     self.im_view = ui.ImageView()
