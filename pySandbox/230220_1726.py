@@ -401,6 +401,10 @@ fu_unpack = struct.Struct('>I')
 
 
 def uint32(s) -> int:
+  
+  if s <= 0xffffffff:
+    return int(s)
+  
   # xxx: 負の値処理するかどうか？
   _s = s if s > 0 else 0
   _c_uint32 = ctypes.c_uint32(int(_s))
@@ -507,9 +511,9 @@ def hash33(p: list) -> list:
   _z = float32(uh.z / UINT_MAX)
   return [_x, _y, _z]
 
+sq_size = 256
 
 RGB_SIZE = 256
-sq_size = 128
 ratio = RGB_SIZE / sq_size
 
 init_img = ImageP.new('RGB', (sq_size, sq_size))
@@ -565,7 +569,7 @@ def setup_img(_time=0):
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
-    self.update_interval = 1 / 30
+    self.update_interval = 1 / 15
     self._time = 0.0
     self.u_time = 0.0
     self.im_view = ui.ImageView()
