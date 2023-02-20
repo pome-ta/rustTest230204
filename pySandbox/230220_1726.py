@@ -507,12 +507,14 @@ def hash33(p: list) -> list:
   _z = float32(uh.z / UINT_MAX)
   return [_x, _y, _z]
 
+
 RGB_SIZE = 256
-sq_size = 320
+sq_size = 32
+ratio = RGB_SIZE / sq_size
 
 init_img = ImageP.new('RGB', (sq_size, sq_size))
 base_array = np.asarray(init_img)
-print(base_array.shape)
+#print(base_array.shape)
 diff_array = np.zeros((sq_size, sq_size, 3), dtype=np.uint8)
 '''
 def show_canvas(_cpu):
@@ -536,58 +538,40 @@ def show_canvas(_cpu):
 '''
 
 
+def setup_img():
+  for x in range(sq_size):
+    for y in range(sq_size):
+      _x = x * ratio
+      _y = y * ratio
+      diff_array[x][y] = np.asarray([_x, _y, 255])
+  imgp = ImageP.fromarray(diff_array)
+  with BytesIO() as bIO:
+    imgp.save(bIO, 'png')
+    return ui.Image.from_data(bIO.getvalue())
+
+
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
-    self.update_interval = 1 / 30
+    #self.update_interval = 1 / 30
     self._time = 0.0
     self.u_time = 0.0
-
-  def draw(self):
-    sq = 64
-    margin = 16
-
-    width = sq
-    height = sq
-
-    for x in range(width):
-      for y in range(height):
-        rect = ui.Path.rect(x + margin, y + margin, 1, 1)
-
-        px = x / sq + self.u_time
-        py = y / sq + self.u_time
-
-        if x > sq / 2:
-          _x = hash21([px, py])
-          ui.set_color(_x)
-        else:
-          _x, _y = hash22([px, py])
-          ui.set_color((_x, _y, 1.0))
-        rect.fill()
-
+    self.im_view = ui.ImageView()
+    self.im_view.content_mode = ui.CONTENT_SCALE_ASPECT_FIT
+    self.im_view.flex = 'WH'
+    self.img = setup_img()
+    self.im_view.image = self.img
+    self.add_subview(self.im_view)
+    
   def update(self):
-    self._time += self.update_interval
-    self.u_time = math.floor(60.0 * self._time)
-    self.set_needs_display()
+    pass
 
 
 if __name__ == '__main__':
   view = View()
   #view.present()
   #view.present(hide_title_bar=True)
-  #view.present(style='fullscreen', orientations=['portrait'])
-  ratio = RGB_SIZE / sq_size
-  for x in range(sq_size):
-    for y in range(sq_size):
-      _x = x * ratio
-      _y = y * ratio
-      
-
-      diff_array[x][y] = np.asarray([_x, _y, 255])
-      #print(diff_array[x][y])
-    #out_array = base_array + diff_array
-    #out_img = ImageP.fromarray(out_array)
-  out_img = ImageP.fromarray(diff_array)
+  view.present(style='fullscreen', orientations=['portrait'])
 
   x = 1
 
