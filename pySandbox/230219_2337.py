@@ -507,10 +507,11 @@ def hash33(p: list) -> list:
   _z = float32(uh.z / UINT_MAX)
   return [_x, _y, _z]
 
+sq_size = 128
 
-init_img = ImageP.new('RGB', (32, 32))
+init_img = ImageP.new('RGB', (sq_size, sq_size))
 base_array = np.asarray(init_img)
-diff_array = np.zeros((32, 32, 3), dtype=np.uint8)
+diff_array = np.zeros((sq_size, sq_size, 3), dtype=np.float)
 '''
 def show_canvas(_cpu):
   #canvas = _cpu.memory[0x200:0x600]
@@ -536,7 +537,7 @@ def show_canvas(_cpu):
 class View(ui.View):
   def __init__(self):
     self.bg_color = 1
-    self.update_interval = 1 / 60
+    self.update_interval = 1 / 30
     self._time = 0.0
     self.u_time = 0.0
 
@@ -573,7 +574,13 @@ if __name__ == '__main__':
   view = View()
   #view.present()
   #view.present(hide_title_bar=True)
-  view.present(style='fullscreen', orientations=['portrait'])
+  #view.present(style='fullscreen', orientations=['portrait'])
+  
+  #color_buff = [[]]
+  for x in range(sq_size):
+    for y in range(sq_size):
+      px = x / sq_size
+      py = y / sq_size
 
   x = 1
 
