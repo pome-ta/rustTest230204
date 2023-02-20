@@ -507,11 +507,12 @@ def hash33(p: list) -> list:
   _z = float32(uh.z / UINT_MAX)
   return [_x, _y, _z]
 
-sq_size = 128
+
+sq_size = 256
 
 init_img = ImageP.new('RGB', (sq_size, sq_size))
 base_array = np.asarray(init_img)
-diff_array = np.zeros((sq_size, sq_size, 3), dtype=np.float)
+diff_array = np.zeros((sq_size, sq_size, 3), dtype=np.uint8)
 '''
 def show_canvas(_cpu):
   #canvas = _cpu.memory[0x200:0x600]
@@ -567,7 +568,6 @@ class View(ui.View):
     self._time += self.update_interval
     self.u_time = math.floor(60.0 * self._time)
     self.set_needs_display()
-    
 
 
 if __name__ == '__main__':
@@ -575,12 +575,17 @@ if __name__ == '__main__':
   #view.present()
   #view.present(hide_title_bar=True)
   #view.present(style='fullscreen', orientations=['portrait'])
-  
+
   #color_buff = [[]]
   for x in range(sq_size):
     for y in range(sq_size):
-      px = x / sq_size
-      py = y / sq_size
+      px = int(255 / x) if x else 0
+      py = int(255 / y) if y else 0
+      
+      diff_array[x][y] = np.asarray([px, py, 1])
+      #print(diff_array[x][y])
+  out_array = base_array + diff_array
+  out_img = ImageP.fromarray(out_array)
 
   x = 1
 
