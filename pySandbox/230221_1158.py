@@ -14,6 +14,6 @@ p_canvas = np.zeros((sq_size, sq_size, 3), dtype=np.uint8)
 p_canvas += 1
 p_canvas **= 2
 
-#init_img = ImageP.new('RGB', (sq_size, sq_size))
-#base_array = np.asarray(init_img)
+# init_img = ImageP.new('RGB', (sq_size, sq_size))
+# base_array = np.asarray(init_img)
 imgp = ImageP.fromarray(p_canvas)

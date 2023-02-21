@@ -13,7 +13,7 @@ import ui
 
 
 class uvec2(UserList):
-  def __init__(self, _xy: list=[0.0, 0.0]):
+  def __init__(self, _xy: list = [0.0, 0.0]):
     super().__init__(_xy)
 
   def __add__(self, other: list) -> list:
@@ -156,7 +156,7 @@ class uvec2(UserList):
 
 
 class uvec3(UserList):
-  def __init__(self, _xyz: list=[0.0, 0.0, 0.0]):
+  def __init__(self, _xyz: list = [0.0, 0.0, 0.0]):
     super().__init__(_xyz)
 
   def __add__(self, other: list) -> list:
@@ -425,15 +425,15 @@ def floatBitsToUint(f: float) -> int:
 
 UINT_MAX = 0xffffffff
 k = uvec3([
-  0x456789ab,
-  0x6789ab45,
-  0x89ab4567,
+    0x456789ab,
+    0x6789ab45,
+    0x89ab4567,
 ])
 
 u = uvec3([
-  1,
-  2,
-  3,
+    1,
+    2,
+    3,
 ])  # todo: シフト数
 
 
@@ -475,8 +475,8 @@ def hash21(p: list) -> float:
 
 def hash22(p: list) -> list:
   n = uvec2([
-    floatBitsToUint(p[0]),
-    floatBitsToUint(p[1]),
+      floatBitsToUint(p[0]),
+      floatBitsToUint(p[1]),
   ])
   uh = uhash22(n)
   _x = float32(uh.x / UINT_MAX)
@@ -486,9 +486,9 @@ def hash22(p: list) -> list:
 
 def hash31(p: list) -> float:
   n = uvec3([
-    floatBitsToUint(p[0]),
-    floatBitsToUint(p[1]),
-    floatBitsToUint(p[2]),
+      floatBitsToUint(p[0]),
+      floatBitsToUint(p[1]),
+      floatBitsToUint(p[2]),
   ])
   uh = uhash33(n)
   return float32(uh.x / UINT_MAX)
@@ -496,9 +496,9 @@ def hash31(p: list) -> float:
 
 def hash33(p: list) -> list:
   n = uvec3([
-    floatBitsToUint(p[0]),
-    floatBitsToUint(p[1]),
-    floatBitsToUint(p[2]),
+      floatBitsToUint(p[0]),
+      floatBitsToUint(p[1]),
+      floatBitsToUint(p[2]),
   ])
   uh = uhash33(n)
   _x = float32(uh.x / UINT_MAX)
@@ -554,8 +554,8 @@ class View(ui.View):
     self.im_view = ui.ImageView()
     self.im_view.content_mode = ui.CONTENT_SCALE_ASPECT_FIT
     self.im_view.flex = 'WH'
-    #self.img = setup_img()
-    #self.im_view.image = self.img
+    # self.img = setup_img()
+    # self.im_view.image = self.img
     self.add_subview(self.im_view)
 
   def update(self):
@@ -566,9 +566,8 @@ class View(ui.View):
 
 if __name__ == '__main__':
   view = View()
-  #view.present()
-  #view.present(hide_title_bar=True)
+  # view.present()
+  # view.present(hide_title_bar=True)
   view.present(style='fullscreen', orientations=['portrait'])
 
   x = 1
-
