@@ -10,7 +10,6 @@ np_canvas = np.zeros((sq_size, sq_size, 3), dtype=np.float32)
 
 p_canvas = np.zeros((sq_size, sq_size, 3), dtype=np.uint8)
 
-add_np = np.
 
 p_canvas += 1
 p_canvas **= 2
