@@ -507,7 +507,7 @@ def hash33(p: list) -> list:
   return [_x, _y, _z]
 
 
-sq_size = 64
+sq_size = 128
 
 RGB_SIZE = 256
 ratio = RGB_SIZE / sq_size
