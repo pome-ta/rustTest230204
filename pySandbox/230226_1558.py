@@ -150,21 +150,19 @@ def setup_img(_time=0, u_time=0.0):
 
   for div in range(4):
     if div == 0:
-      canvas_px[:_div, :_div, 0] = h21[:_div, :_div] * RGB_SIZE
-      canvas_px[:_div, :_div, 1] = h21[:_div, :_div] * RGB_SIZE
-      canvas_px[:_div, :_div, 2] = h21[:_div, :_div] * RGB_SIZE
+      for i in range(3):
+        canvas_px[:_div, :_div, i] = h21[:_div, :_div] * RGB_SIZE
     elif div == 1:
-      canvas_px[_div:, :_div, 0] = h22[_div:, :_div, 0] * RGB_SIZE
-      canvas_px[_div:, :_div, 1] = h22[_div:, :_div, 1] * RGB_SIZE
+      for i in range(2):
+        canvas_px[_div:, :_div, i] = h22[_div:, :_div, i] * RGB_SIZE
       canvas_px[_div:, :_div, 2] = RGB_SIZE
     elif div == 2:
-      canvas_px[:_div, _div:, 0] = h31[:_div, _div:] * RGB_SIZE
-      canvas_px[:_div, _div:, 1] = h31[:_div, _div:] * RGB_SIZE
-      canvas_px[:_div, _div:, 2] = h31[:_div, _div:] * RGB_SIZE
+      for i in range(3):
+        canvas_px[:_div, _div:, i] = h31[:_div, _div:] * RGB_SIZE
     elif div == 3:
-      canvas_px[_div:, _div:, 0] = h33[_div:, _div:, 0] * RGB_SIZE
-      canvas_px[_div:, _div:, 1] = h33[_div:, _div:, 1] * RGB_SIZE
-      canvas_px[_div:, _div:, 2] = h33[_div:, _div:, 2] * RGB_SIZE
+      for i in range(3):
+        canvas_px[_div:, _div:, i] = h33[_div:, _div:, i] * RGB_SIZE
+
   imgp = ImageP.fromarray(canvas_px)
 
   with BytesIO() as bIO:
