@@ -26,11 +26,29 @@ u_time = 0.4321
 f_pack = struct.Struct('>f')
 f_unpack = struct.Struct('>I')
 
+
+@lru_cache()
+def floatBitsToUint(f: float) -> int:
+  return f_unpack.unpack(f_pack.pack(f))[0]
+
+
+@lru_cache()
+def _mix(x, y, a):
+  return (x * (1 - a)) + (y * a)
+
+
+np_floatBitsToUint = np.vectorize(
+  floatBitsToUint, otypes=[np.uint32], cache=True)
+
+np_mix = np.vectorize(_mix, otypes=[np.float32], cache=True)
+'''
 np_floatBitsToUint = np.vectorize(
   lambda f: f_unpack.unpack(f_pack.pack(f))[0], otypes=[np.uint32], cache=True)
 
+
 np_mix = np.vectorize(
   lambda x, y, a: (x * (1 - a)) + (y * a), otypes=[np.float32], cache=True)
+'''
 
 
 @lru_cache()
@@ -202,11 +220,11 @@ def setup_img(_time=0, u_time=0.0):
   vec3[..., 0] = _pos[..., 0]
   vec3[..., 1] = _pos[..., 1]
   vec3[..., 2] = u_time
-  
+
   v21_n = vnoise21_n(_pos)
   v21_f = vnoise21_f(_pos)
   v31 = vnoise31(vec3)
-  
+
   out_n = imageP2uint8_convert(v21_n)
   out_f = imageP2uint8_convert(v21_f)
   out_3 = imageP2uint8_convert(v31)
