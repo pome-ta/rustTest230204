@@ -21,8 +21,6 @@ height_size = sq_size
 RGB_SIZE = 255
 color_ch = 3
 
-u_time = 0.4321
-
 f_pack = struct.Struct('>f')
 f_unpack = struct.Struct('>I')
 
@@ -233,11 +231,11 @@ def setup_img(_time=0, u_time=0.0):
     if div == 0:
       for i in range(3):
         s = splt * div
-        e = splt * (div + 1)
+        e = splt * (div + 1) -1
         canvas_px[..., s:e, i] = out_n[..., s:e]
     if div == 1:
       for i in range(3):
-        s = splt * div + 1
+        s = splt * div
         e = splt * (div + 1)
         canvas_px[..., s:e, i] = out_f[..., s:e]
     if div == 2:
