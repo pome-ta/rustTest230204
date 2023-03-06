@@ -1,7 +1,6 @@
-import struct
 import math
 from itertools import product
-from functools import lru_cache
+
 from io import BytesIO
 
 import numpy as np
@@ -9,20 +8,10 @@ from PIL import Image as ImageP
 
 import ui
 
-UINT_MAX = 0xffff_ffff
-
-k = np.array([0x456789ab, 0x6789ab45, 0x89ab4567]).astype(np.uint32)
-u = np.array([1, 2, 3]).astype(np.uint32)
-
-sq_size: int = 128
-
-width_size = sq_size
-height_size = sq_size
-
 RGB_SIZE = 255
-color_ch = 3
-_xy = range(2)
+COLOR_CH = 3
 
+_xy = range(2)
 product_list2 = list(product(_xy, repeat=2))
 product_list3 = list(product(_xy, repeat=3))
 
@@ -37,20 +26,91 @@ def np_mix(x: np.array, y: np.array, a: np.array) -> np.array:
   return (x * (1.0 - a)) + (y * a)
 
 
-@lru_cache()
+def np_fract(p: np.array) -> np.array:
+  return np.mod(p, 1.0)
+
+
+def np_length(v: np.array) -> np.array:
+  _, _, _shape = v.shape
+  return np.sqrt(sum([np.square(v[..., _i]) for _i in range(_shape)]))
+
+
+def np_normalize(v: np.array) -> np.array:
+  _, _, _shape = v.shape
+  _l = np_length(v)
+  return np.dstack([v[..., _i] / _l for _i in range(_shape)])
+
+
+def np_dot(v0: np.array, v1: np.array) -> np.array:
+  _, _, _shape = v0.shape
+  return sum([v0[..., _i] * v1[..., _i] for _i in range(_shape)])
+
+
+def np_min(v: np.array, a) -> np.array:
+  v[np.less(a, v)] = a
+  return v
+
+
+def np_max(v: np.array, a) -> np.array:
+  v[np.less(v, a)] = a
+  return v
+
+
+def np_clamp(v: np.array, a, b) -> np.array:
+  return np_min(np_max(v, a), b)
+
+
 def _vec(w: int, h: int, c: int) -> np.array:
   return np.empty((w, h, c)).astype(np.float32)
 
 
-@lru_cache()
 def FragCoord(width, height) -> np.array:
   _row = np.arange(0, width)
-  _col = np.arange(0, height).reshape(height, 1)
+  _col = _row[:np.newaxis]
   _x, _y = np.meshgrid(_row, _col)
   _pos = _vec(width, height, 2)
   _pos[..., 0] = _x
   _pos[..., 1] = _y
   return _pos
+
+
+def switch_yx(p: np.array) -> np.array:
+  _p = p.copy()
+  _p[..., 0] = p[..., 1]
+  _p[..., 1] = p[..., 0]
+  return _p
+
+
+def switch_yzx(p: np.array) -> np.array:
+  _p = p.copy()
+  _p[..., 0] = p[..., 1]
+  _p[..., 1] = p[..., 2]
+  _p[..., 2] = p[..., 0]
+  return _p
+
+
+def hsv2rgb(cx: np.array, cy: float, cz: float):
+  cx_vec3 = _vec(width_size, height_size, 3)
+  cx_vec3[..., 0], cx_vec3[..., 1], cx_vec3[..., 2] = [cx, cx, cx]
+  rgb_vec3 = _vec(width_size, height_size, 3)
+  rgb_vec3[..., 0], rgb_vec3[..., 1], rgb_vec3[..., 2] = [0.0, 4.0, 2.0]
+
+  _abs_mod = np.abs(np.mod(cx_vec3 * 6.0 + rgb_vec3, 6.0) - 3.0)
+  rgb = np_clamp(_abs_mod - 1.0, 0.0, 1.0)
+
+  x_vec3 = _vec(width_size, height_size, 3)
+  x_vec3[..., 0], x_vec3[..., 1], x_vec3[..., 2] = [1.0, 1.0, 1.0]
+  cy_vec3 = _vec(width_size, height_size, 3)
+  cy_vec3[..., 0], cy_vec3[..., 1], cy_vec3[..., 2] = [cy, cy, cy]
+  hsv = cz * np_mix(x_vec3, rgb, cy_vec3)
+  return hsv.astype(np.float32)
+
+
+# start hash
+
+UINT_MAX = 0xffff_ffff
+k = np.array([0x456789ab, 0x6789ab45, 0x89ab4567]).astype(np.uint32)
+u = np.array([1, 2, 3]).astype(np.uint32)
 
 
 def uhash11(n: np.array) -> np.array:
@@ -61,62 +121,27 @@ def uhash11(n: np.array) -> np.array:
   return n * k[0]
 
 
-def hash11(p: np.array) -> np.array:
-  n = np_floatBitsToUint(p)
-  return uhash11(n).astype(np.float32) / float(UINT_MAX)
-
-
 def uhash22(n: np.array) -> np.array:
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 0]
-  n ^= (_n << u[:2])
-
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 0]
-  n ^= (_n >> u[:2])
-
-  n *= k[:2]
-
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 0]
-  n ^= (_n << u[:2])
-  return n * k[:2]
+  _u = u[:2]
+  _k = k[:2]
+  n ^= (switch_yx(n) << _u)
+  n ^= (switch_yx(n) >> _u)
+  n *= _k
+  n ^= (switch_yx(n) << _u)
+  return n * _k
 
 
 def uhash33(n: np.array) -> np.array:
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 2]
-  _n[..., 2] = n[..., 0]
-  n ^= (_n << u)
-
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 2]
-  _n[..., 2] = n[..., 0]
-  n ^= (_n >> u)
-
+  n ^= (switch_yzx(n) << u)
+  n ^= (switch_yzx(n) >> u)
   n *= k
-
-  _n = n.copy()
-  _n[..., 0] = n[..., 1]
-  _n[..., 1] = n[..., 2]
-  _n[..., 2] = n[..., 0]
-  n ^= (_n << u)
+  n ^= (switch_yzx(n) << u)
   return n * k
 
 
-def hash22(p: np.array) -> np.array:
+def hash11(p: np.array) -> np.array:
   n = np_floatBitsToUint(p)
-  return uhash22(n).astype(np.float32) / float(UINT_MAX)
-
-
-def hash33(p: np.array) -> np.array:
-  n = np_floatBitsToUint(p)
-  return uhash33(n).astype(np.float32) / float(UINT_MAX)
+  return uhash11(n).astype(np.float32) / float(UINT_MAX)
 
 
 def hash21(p: np.array) -> np.array:
@@ -131,31 +156,23 @@ def hash31(p: np.array) -> np.array:
   return _h33[..., 0] / float(UINT_MAX)
 
 
-def vnoise21_n(p: np.array) -> np.array:
+def hash22(p: np.array) -> np.array:
+  n = np_floatBitsToUint(p)
+  return uhash22(n).astype(np.float32) / float(UINT_MAX)
+
+
+def hash33(p: np.array) -> np.array:
+  n = np_floatBitsToUint(p)
+  return uhash33(n).astype(np.float32) / float(UINT_MAX)
+
+
+# end hash
+
+
+def vnoise21(p: np.array) -> np.array:
   n = np.floor(p)
   v = [hash21(n + [_i, _j]) for _j, _i in product_list2]
-  f = p - n
-  return np_mix(
-    np_mix(v[0], v[1], f[..., 0]),
-    np_mix(v[2], v[3], f[..., 0]),
-    f[..., 1], )
-
-
-def vnoise21_h(p: np.array) -> np.array:
-  n = np.floor(p)
-  v = [hash21(n + [_i, _j]) for _j, _i in product_list2]
-  f = p - n
-  f = f * f * (3.0 - 2.0 * f)
-  return np_mix(
-    np_mix(v[0], v[1], f[..., 0]),
-    np_mix(v[2], v[3], f[..., 0]),
-    f[..., 1], )
-
-
-def vnoise21_q(p: np.array) -> np.array:
-  n = np.floor(p)
-  v = [hash21(n + [_i, _j]) for _j, _i in product_list2]
-  f = p - n
+  f = np_fract(p)
   f = f * f * f * (10.0 - 15.0 * f + 6.0 * f * f)
   return np_mix(
     np_mix(v[0], v[1], f[..., 0]),
@@ -166,84 +183,121 @@ def vnoise21_q(p: np.array) -> np.array:
 def vnoise31(p: np.array) -> np.array:
   n = np.floor(p)
   v = [hash31(n + [_i, _j, _k]) for _k, _j, _i in product_list3]
-  f = p - n
-  f = f * f * (3.0 - 2.0 * f)
-
+  f = np_fract(p)
+  f = f * f * f * (10.0 - 15.0 * f + 6.0 * f * f)
   w = [
     np_mix(
       np_mix(v[4 * _i], v[4 * _i + 1], f[..., 0]),
       np_mix(v[4 * _i + 2], v[4 * _i + 3], f[..., 0]), f[..., 1]) for _i in _xy
   ]
-
   return np_mix(w[0], w[1], f[..., 2])
 
 
-def grad_h(p: np.array) -> np.array:
-  eps = 0.001
-  x = vnoise21_h(p + [eps, 0.0]) - vnoise21_h(p - [eps, 0.0])
-  y = vnoise21_h(p + [0.0, eps]) - vnoise21_h(p - [0.0, eps])
-  _w, _h, _c = p.shape
-  vec2 = _vec(_w, _h, _c)
-  vec2[..., 0] = x
-  vec2[..., 1] = y
-  return 0.5 * vec2 / eps
+def gnoise21(p: np.array) -> np.array:
+  n: np.array = np.floor(p)
+  f: np.array = np_fract(p)
+  v: list = [
+    np_dot(np_normalize(hash22(n + [_i, _j]) - 0.5), f - [_i, _j])
+    for _j, _i in product_list2
+  ]
+  f = f * f * f * (10.0 - 15.0 * f + 6.0 * f * f)
+  return 0.5 * np_mix(
+    np_mix(
+      v[0],
+      v[1],
+      f[..., 0], ),
+    np_mix(
+      v[2],
+      v[3],
+      f[..., 0], ),
+    f[..., 1], ) + 0.5
 
 
-def grad_q(p: np.array) -> np.array:
-  eps = 0.001
-  x = vnoise21_q(p + [eps, 0.0]) - vnoise21_q(p - [eps, 0.0])
-  y = vnoise21_q(p + [0.0, eps]) - vnoise21_q(p - [0.0, eps])
-  _w, _h, _c = p.shape
-  vec2 = _vec(_w, _h, _c)
-  vec2[..., 0] = x
-  vec2[..., 1] = y
-  return 0.5 * vec2 / eps
+def gnoise31(p: np.array) -> np.array:
+  n: np.array = np.floor(p)
+  f: np.array = np_fract(p)
+  v: list = [
+    np_dot(np_normalize(hash33(n + [_i, _j, _k]) - 0.5), f - [_i, _j, _k])
+    for _k, _j, _i in product_list3
+  ]
+  f = f * f * f * (10.0 - 15.0 * f + 6.0 * f * f)
+  w: list = [
+    np_mix(
+      np_mix(
+        v[4 * _i],
+        v[4 * _i + 1],
+        f[..., 0], ),
+      np_mix(
+        v[4 * _i + 2],
+        v[4 * _i + 3],
+        f[..., 0], ),
+      f[..., 1], ) for _i in _xy
+  ]
+  return 0.5 * np_mix(
+    w[0],
+    w[1],
+    f[..., 2], ) + 0.5
 
 
 def convert_uint8_rgb(_rgb):
   _l = _rgb * RGB_SIZE
   _l[np.less(_l, 0)] = 0
   _l[np.less(RGB_SIZE, _l)] = RGB_SIZE
-  return _l
+  return np.flipud(_l).astype(np.uint8)
 
 
-canvas_px = np.zeros((width_size, height_size, 3)).astype(np.uint8)
-fragCoord = FragCoord(width_size, height_size)
-
-pos = fragCoord / sq_size
-div_num = 2
-split_num = int(sq_size / div_num)
-
-
-@lru_cache()
 def setup_img(_time=0, u_time=0.0):
-  _pos = 4.0 * pos + u_time
+  pos = fragCoord / sq_size
+  pos = 18.0 * pos + u_time
 
-  # xxx: 2回やるの無駄感あるけど
-  np_gh = grad_h(_pos)
-  _, _, _index = np_gh.shape
-  np_gq = grad_q(_pos)
-  _, _, _index = np_gq.shape
+  
+  vec3[..., 0], vec3[..., 1], vec3[..., 2] = [pos[..., 0], pos[..., 1], u_time]
 
-  np_dot_h = sum([1.0 * np_gh[..., i] for i in range(_index)])
-  np_dot_q = sum([1.0 * np_gq[..., i] for i in range(_index)])
+  v21 = vnoise21(pos)
+  v31 = vnoise31(vec3)
+  g21 = gnoise21(pos)
+  g31 = gnoise31(vec3)
 
-  u_dot_h = convert_uint8_rgb(np_dot_h)
-  u_dot_q = convert_uint8_rgb(np_dot_q)
-
-  for div in range(div_num):
-    u_color, s, e = [
-      u_dot_q,
-      split_num,
-      sq_size,
-    ] if div else [
-      u_dot_h,
+  div_num = 2
+  split_num = int(sq_size / div_num)
+  split_list = [
+    [
+      hsv2rgb(v21, 1.0, 1.0),
       0,
       split_num,
-    ]
-    for c in range(color_ch):
-      canvas_px[..., s:e, c] = u_color[..., s:e]
+      0,
+      split_num,
+    ],
+    [
+      hsv2rgb(v31, 1.0, 1.0),
+      split_num,
+      sq_size,
+      0,
+      split_num,
+    ],
+    [
+      hsv2rgb(g21, 1.0, 1.0),
+      0,
+      split_num,
+      split_num,
+      sq_size,
+    ],
+    [
+      hsv2rgb(g31, 1.0, 1.0),
+      split_num,
+      sq_size,
+      split_num,
+      sq_size,
+    ],
+  ]
 
+  for div in range(len(split_list)):
+    v, sx, ex, sy, ey = split_list[div]
+
+    for c in range(COLOR_CH):
+      fragColor[sx:ex, sy:ey, c] = v[sx:ex, sy:ey, c]
+
+  canvas_px = convert_uint8_rgb(fragColor)
   imgp = ImageP.fromarray(canvas_px)
 
   with BytesIO() as bIO:
@@ -253,7 +307,7 @@ def setup_img(_time=0, u_time=0.0):
 
 class View(ui.View):
   def __init__(self, *args, **kwargs):
-    self.name = 'vnoiseGrad'
+    self.name = 'noiseRange'
     self.bg_color = 1
     self.update_interval = 1 / 30
     self.u_time = 0.0
@@ -270,6 +324,14 @@ class View(ui.View):
 
 
 if __name__ == '__main__':
+  sq_size: int = 128
+  width_size = sq_size
+  height_size = sq_size
+
+  fragColor = _vec(width_size, height_size, COLOR_CH)
+  fragCoord = FragCoord(width_size, height_size)
+  vec3 = _vec(width_size, height_size, 3)
+
   view = View()
   # view.present()
   # view.present(hide_title_bar=True)
