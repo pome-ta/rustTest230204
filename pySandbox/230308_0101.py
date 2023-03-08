@@ -288,9 +288,9 @@ def setup_img(_time=0, u_time=0.0):
   vec3[..., 0], vec3[..., 1], vec3[..., 2] = [pos[..., 0], pos[..., 1], u_time]
 
   p31 = pnoise31(vec3)
-  
+
   v = [p31, abs(np.sin(u_time) / 2.0), abs(np.tan(u_time))]
-  
+
   for c in range(COLOR_CH):
     fragColor[..., c] = v[c]
 
